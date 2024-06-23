@@ -1,99 +1,33 @@
 #pragma once
 
-#include "Components/PlayerControllerComponent.h"
-#include "Components/RigidBodyComponent.h"
-#include "Components/BoxCollidercomponent.h"
-#include "Components/PlayerTagComponent.h"
-#include "EventBus/EventBus.h"
-#include "Events/KeyPressEvent.h"
-#include "Events/KeyReleaseEvent.h"
 #include <entt.hpp>
-#include <SDL.h>
+
+class KeyPressEvent;
+class KeyReleaseEvent;
+class EventBus;
+
+struct AnimationComponent;
+struct BoxColliderComponent;
+struct PlayerControllerComponent;
+struct RigidBodyComponent;
+struct SpriteComponent;
+
+using Animation = AnimationComponent;
+using BoxCollider = BoxColliderComponent;
+using PlayerController = PlayerControllerComponent;
+using RigidBody = RigidBodyComponent;
+using Sprite = SpriteComponent;
 
 class PlayerControlsSystem {
 public:
-	static void SubscribeToEvents(std::unique_ptr<EventBus>& eventBus) {
-		eventBus->SubscribeToEvent<KeyPressEvent>(OnKeyPress);
-		eventBus->SubscribeToEvent<KeyReleaseEvent>(OnKeyRelease);
-	}
+    static void Update(std::unique_ptr<entt::registry>& registry);
+    static void SubscribeToEvents(std::unique_ptr<EventBus>& eventBus);
 
-	static void OnKeyPress(std::unique_ptr<entt::registry>& registry, KeyPressEvent& event) {
-		auto view = registry->view<Animation, PlayerController, PlayerTag, RigidBody, Sprite, BoxCollider>();
-		
-		for (auto entity : view) {
-			auto& playerController = view.get<PlayerController>(entity);
-			auto& rigidBody = view.get<RigidBody>(entity);
-			auto& animation = view.get<Animation>(entity);
-			auto& sprite = view.get<Sprite>(entity);
-			auto& collider = view.get<BoxCollider>(entity);
-			
-			playerController.activeKeys.insert(event.symbol);
-
-			bool movingRight = playerController.activeKeys.count(SDLK_RIGHT);
-			bool movingLeft = playerController.activeKeys.count(SDLK_LEFT);
-			bool jumping = playerController.activeKeys.count(SDLK_SPACE);
-
-			if (movingRight && !movingLeft) {
-				rigidBody.velocity.x = rigidBody.speed;
-				animation.currentAnimationSpeed = animation.defaultAnimationSpeed;
-				sprite.flip = SDL_FLIP_NONE;
-				
-			} else if (movingLeft && !movingRight) {
-				rigidBody.velocity.x = -rigidBody.speed;
-				animation.currentAnimationSpeed = animation.defaultAnimationSpeed;
-				sprite.flip = SDL_FLIP_HORIZONTAL;
-			
-			} else if (movingLeft && movingRight) {
-				rigidBody.velocity.x = 0;
-				animation.currentAnimationSpeed = 0;
-			}
-
-			if (jumping && collider.isGrounded) {
-				playerController.jumpTime = SDL_GetTicks();
-				rigidBody.velocity.y = -200;
-				rigidBody.gravityEnabled = false;
-			}
-		}
-	}
-
-	static void OnKeyRelease(std::unique_ptr<entt::registry>& registry, KeyReleaseEvent& event) {
-		auto view = registry->view<Animation, PlayerController, PlayerTag, RigidBody, Sprite, BoxCollider>();
-
-		for (auto entity : view) {
-			auto& playerController = view.get<PlayerController>(entity);
-			auto& rigidBody = view.get<RigidBody>(entity);
-			auto& animation = view.get<Animation>(entity);
-			auto& sprite = view.get<Sprite>(entity);
-			auto& collider = view.get<BoxCollider>(entity);
-
-			playerController.activeKeys.erase(event.symbol);
-
-			bool movingRight = playerController.activeKeys.count(SDLK_RIGHT);
-			bool movingLeft = playerController.activeKeys.count(SDLK_LEFT);
-			bool jumping = playerController.activeKeys.count(SDLK_SPACE);
-
-			if (movingRight && !movingLeft) {
-				rigidBody.velocity.x = rigidBody.speed;
-				animation.currentAnimationSpeed = animation.defaultAnimationSpeed;
-				sprite.flip = SDL_FLIP_NONE;
-
-			} else if (movingLeft && !movingRight) {
-				rigidBody.velocity.x = -rigidBody.speed;
-				animation.currentAnimationSpeed = animation.defaultAnimationSpeed;
-				sprite.flip = SDL_FLIP_HORIZONTAL;
-
-			} else if (movingLeft && movingRight) {
-				rigidBody.velocity.x = 0;
-				animation.currentAnimationSpeed = 0;
-			} else if (!movingLeft && !movingRight) {
-				rigidBody.velocity.x = 0;
-				animation.currentAnimationSpeed = 0;
-			}
-
-			if (!jumping && !collider.isGrounded) {
-				rigidBody.gravityEnabled = true;
-				rigidBody.velocity.y = 0;
-			}
-		}
-	}
+private:
+    static void UpdatePlayerState(PlayerController& playerController);
+    static void OnKeyPress(std::unique_ptr<entt::registry>& registry, KeyPressEvent& event);
+    static void OnKeyRelease(std::unique_ptr<entt::registry>& registry, KeyReleaseEvent& event);
+    static void HandleMovement(const PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider);
+    static void HandleJumping(PlayerController& playerController, RigidBody& rigidBody, const BoxCollider& collider);
+    static void HandleGravity(const PlayerController& playerController, RigidBody& rigidBody, const BoxCollider& collider);
 };

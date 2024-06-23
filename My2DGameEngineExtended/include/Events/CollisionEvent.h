@@ -1,11 +1,20 @@
 #pragma once
 
-#include <entt.hpp>
 #include "EventBus/Event.h"
+#include <entt.hpp>
+
+enum class CollisionType {
+    None,
+    Ground,
+    Ceiling,
+    Left,
+    Right
+};
 
 class CollisionEvent : public Event {
 public:
 	entt::entity a;
 	entt::entity b;
-	CollisionEvent(entt::entity a, entt::entity b) : a{a}, b{b} {}
+    CollisionType collisionType;
+    CollisionEvent(entt::entity a, entt::entity b, CollisionType collisionType) : a{a}, b{b}, collisionType{collisionType} {}
 };

@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include <glm.hpp>
 
 struct BoxColliderComponent {
@@ -7,7 +6,8 @@ struct BoxColliderComponent {
 	int height{0};
 	glm::vec2 offset{0, 0};
 	bool isGrounded{false};
-	bool isTouchingWall{false};
+	bool isTouchingLeftWall{false};
+	bool isTouchingRightWall{false};
 	bool isTouchingCeiling{false};
 
 	BoxColliderComponent() = default;

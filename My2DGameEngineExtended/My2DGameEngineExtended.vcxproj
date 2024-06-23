@@ -659,6 +659,7 @@ for /r $(ProjectDir)external\ %%f in (*.dll) do @copy "%%f" $(OutDir)</Command>
     <ClInclude Include="include\Systems\PlayerControlsSystem.h" />
     <ClInclude Include="include\Systems\RenderColliderSystem.h" />
     <ClInclude Include="include\Systems\RenderSystem.h" />
+    <ClInclude Include="include\Utilities\Rect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\libraries\glm\detail\func_common.inl" />
@@ -812,6 +813,12 @@ for /r $(ProjectDir)external\ %%f in (*.dll) do @copy "%%f" $(OutDir)</Command>
     <ClCompile Include="src\libraries\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Systems\AnimationSystem.cpp" />
+    <ClCompile Include="src\Systems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\MovementSystem.cpp" />
+    <ClCompile Include="src\Systems\PlayerControlsSystem.cpp" />
+    <ClCompile Include="src\Systems\RenderColliderSystem.cpp" />
+    <ClCompile Include="src\Systems\RenderSystem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
