@@ -11,6 +11,8 @@ struct PlayerControllerComponent {
     bool isMovingLeft{false};
     bool isJumping{false};
 
+    PlayerControllerComponent() = default;
+
     PlayerControllerComponent(const Uint32 jumpTimeLimit) : jumpTimeLimit{jumpTimeLimit} {}
 };
 using PlayerController = PlayerControllerComponent;

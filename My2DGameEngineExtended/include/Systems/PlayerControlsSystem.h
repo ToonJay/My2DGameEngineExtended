@@ -28,6 +28,6 @@ private:
     static void OnKeyPress(std::unique_ptr<entt::registry>& registry, KeyPressEvent& event);
     static void OnKeyRelease(std::unique_ptr<entt::registry>& registry, KeyReleaseEvent& event);
     static void HandleMovement(const PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider);
-    static void HandleJumping(PlayerController& playerController, RigidBody& rigidBody, const BoxCollider& collider);
-    static void HandleGravity(const PlayerController& playerController, RigidBody& rigidBody, const BoxCollider& collider);
+    static void HandleJumping(PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider);
+    static void HandleGravity(const PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider);
 };

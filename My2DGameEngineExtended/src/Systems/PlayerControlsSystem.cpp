@@ -5,7 +5,7 @@
 #include "Components/AnimationComponent.h"
 #include "Components/BoxColliderComponent.h"
 #include "Components/PlayerControllerComponent.h"
-#include "Components/PlayerTagComponent.h"
+#include "Components/TagComponents/PlayerTagComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/SpriteComponent.h"
 
@@ -20,8 +20,8 @@ void PlayerControlsSystem::Update(std::unique_ptr<entt::registry>& registry) {
         auto& collider = view.get<BoxCollider>(entity);
 
         HandleMovement(playerController, rigidBody, animation, sprite, collider);
-        HandleJumping(playerController, rigidBody, collider);
-        HandleGravity(playerController, rigidBody, collider);
+        HandleJumping(playerController, rigidBody, animation, sprite, collider);
+        HandleGravity(playerController, rigidBody, animation, sprite, collider);
     }
 }
 
@@ -61,39 +61,51 @@ void PlayerControlsSystem::OnKeyRelease(std::unique_ptr<entt::registry>& registr
 }
 
 void PlayerControlsSystem::HandleMovement(const PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider) {
+    if (playerController.isMovingRight) {
+        sprite.flip = SDL_FLIP_NONE;
+    } else if (playerController.isMovingLeft) {
+        sprite.flip = SDL_FLIP_HORIZONTAL;
+    }
+
     if (playerController.isMovingRight && !playerController.isMovingLeft && !collider.isTouchingRightWall) {
         rigidBody.velocity.x = rigidBody.speed;
         animation.currentAnimationSpeed = animation.defaultAnimationSpeed;
-        sprite.flip = SDL_FLIP_NONE;
+        
     } else if (playerController.isMovingLeft && !playerController.isMovingRight && !collider.isTouchingLeftWall) {
         rigidBody.velocity.x = -rigidBody.speed;
         animation.currentAnimationSpeed = animation.defaultAnimationSpeed;
-        sprite.flip = SDL_FLIP_HORIZONTAL;
+        
     } else {
         rigidBody.velocity.x = 0;
         animation.currentAnimationSpeed = 0;
     }
 }
 
-void PlayerControlsSystem::HandleJumping(PlayerController& playerController, RigidBody& rigidBody, const BoxCollider& collider) {
+void PlayerControlsSystem::HandleJumping(PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider) {
     if (playerController.isJumping && collider.isGrounded && !collider.isTouchingCeiling) {
         playerController.jumpTime = SDL_GetTicks();
+        sprite.assetId = "bunny-jump";
+        animation.numFrames = 1;
     }
 
     if (playerController.isJumping && (SDL_GetTicks() - playerController.jumpTime) <= playerController.jumpTimeLimit && !collider.isTouchingCeiling) {
-        rigidBody.velocity.y = -rigidBody.fallSpeed;
+        rigidBody.velocity.y = -rigidBody.jumpSpeed; 
     } else {
         playerController.jumpTime = 0;
-        playerController.isJumping = false;
+        playerController.isJumping = false; 
     }
 }
 
-void PlayerControlsSystem::HandleGravity(const PlayerController& playerController, RigidBody& rigidBody, const BoxCollider& collider) {
+void PlayerControlsSystem::HandleGravity(const PlayerController& playerController, RigidBody& rigidBody, Animation& animation, Sprite& sprite, const BoxCollider& collider) {
     if (collider.isGrounded && !playerController.isJumping) {
         rigidBody.velocity.y = 0;
+        sprite.assetId = "bunny-image";
+        animation.numFrames = 2;
     }
 
     if (!playerController.isJumping && !collider.isGrounded) {
-        rigidBody.velocity.y = rigidBody.jumpSpeed;
+        rigidBody.velocity.y = rigidBody.fallSpeed;
+        sprite.assetId = "bunny-jump";
+        animation.numFrames = 1;
     }
 }

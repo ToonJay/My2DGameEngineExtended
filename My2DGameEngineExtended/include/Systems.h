@@ -6,3 +6,4 @@
 #include "Systems/PlayerControlsSystem.h"
 #include "Systems/RenderColliderSystem.h"
 #include "Systems/RenderSystem.h"
+#include "Systems/WormEnemyAiSystem.h"

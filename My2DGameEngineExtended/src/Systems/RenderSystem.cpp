@@ -8,8 +8,8 @@ void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<entt::registry
 	auto view = registry->view<Transform, Sprite>();
 
 	for (auto entity : view) {
-		auto& transform = view.get<Transform>(entity);
-		auto& sprite = view.get<Sprite>(entity);
+		const auto& transform = view.get<Transform>(entity);
+		const auto& sprite = view.get<Sprite>(entity);
 
 		SDL_Rect srcRect = sprite.srcRect;
 

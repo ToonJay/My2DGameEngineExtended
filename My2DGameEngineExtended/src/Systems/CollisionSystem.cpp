@@ -1,5 +1,4 @@
 #include "Systems/CollisionSystem.h"
-
 #include "Events/CollisionEvent.h"
 #include "EventBus/EventBus.h"
 #include "Components/BoxColliderComponent.h"
@@ -66,46 +65,64 @@ CollisionType CollisionSystem::CheckCollision(const Transform& aTransform, const
 		aTransform.position.x + aCollider.offset.x * aTransform.scale.x,
 		aTransform.position.y + (aCollider.height + aCollider.offset.y) * aTransform.scale.y,
 		aCollider.width * aTransform.scale.x,
-		2 * aTransform.scale.y
+		aCollider.margin * aTransform.scale.y
 	};
 	Rect aTopRect{
 		aTransform.position.x + aCollider.offset.x * aTransform.scale.x,
-		aTransform.position.y + (aCollider.offset.y - 2) * aTransform.scale.y,
+		aTransform.position.y + (aCollider.offset.y - aCollider.margin) * aTransform.scale.y,
 		aCollider.width * aTransform.scale.x,
-		2 * aTransform.scale.y
+		aCollider.margin * aTransform.scale.y
 	};
 	Rect aRightRect{
 		aTransform.position.x + (aCollider.width + aCollider.offset.x) * aTransform.scale.x,
 		aTransform.position.y + aCollider.offset.y * aTransform.scale.y,
-		2 * aTransform.scale.x,
+		aCollider.margin * aTransform.scale.x,
 		aCollider.height * aTransform.scale.y
 	};
 	Rect aLeftRect{
-		aTransform.position.x + (aCollider.offset.x - 2) * aTransform.scale.x,
+		aTransform.position.x + (aCollider.offset.x - aCollider.margin) * aTransform.scale.x,
 		aTransform.position.y + aCollider.offset.y * aTransform.scale.y,
-		2 * aTransform.scale.x,
+		aCollider.margin * aTransform.scale.x,
 		aCollider.height * aTransform.scale.y
 	};
-	Rect bRect{
+	Rect bBottomRect{
 		bTransform.position.x + bCollider.offset.x * bTransform.scale.x,
-		bTransform.position.y + bCollider.offset.y * bTransform.scale.y,
+		bTransform.position.y + (bCollider.height + bCollider.offset.y) * bTransform.scale.y,
 		bCollider.width * bTransform.scale.x,
+		bCollider.margin * bTransform.scale.y
+	};
+	Rect bTopRect{
+		bTransform.position.x + bCollider.offset.x * bTransform.scale.x,
+		bTransform.position.y + (bCollider.offset.y - bCollider.margin) * bTransform.scale.y,
+		bCollider.width * bTransform.scale.x,
+		bCollider.margin * bTransform.scale.y
+	};
+	Rect bRightRect{
+		bTransform.position.x + (bCollider.width + bCollider.offset.x) * bTransform.scale.x,
+		bTransform.position.y + bCollider.offset.y * bTransform.scale.y,
+		bCollider.margin * bTransform.scale.x,
+		bCollider.height * bTransform.scale.y
+	};
+	Rect bLeftRect{
+		bTransform.position.x + (bCollider.offset.x - bCollider.margin) * bTransform.scale.x,
+		bTransform.position.y + bCollider.offset.y * bTransform.scale.y,
+		bCollider.margin * bTransform.scale.x,
 		bCollider.height * bTransform.scale.y
 	};
 
-	if (AABBCollisionCheck(aBottomRect, bRect)) {
+	if (AABBCollisionCheck(aBottomRect, bTopRect)) {
 		spdlog::info("Ground collision detected.");
 		return CollisionType::Ground;
 	}
-	if (AABBCollisionCheck(aTopRect, bRect)) {
+	if (AABBCollisionCheck(aTopRect, bBottomRect)) {
 		spdlog::info("Ceiling collision detected.");
 		return CollisionType::Ceiling;
 	}
-	if (AABBCollisionCheck(aRightRect, bRect)) {
+	if (AABBCollisionCheck(aRightRect, bLeftRect)) {
 		spdlog::info("Right collision detected.");
 		return CollisionType::Right;
 	}
-	if (AABBCollisionCheck(aLeftRect, bRect)) {
+	if (AABBCollisionCheck(aLeftRect, bRightRect)) {
 		spdlog::info("Left collision detected.");
 		return CollisionType::Left;
 	}

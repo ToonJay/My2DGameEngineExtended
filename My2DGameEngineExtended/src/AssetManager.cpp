@@ -23,6 +23,7 @@ bool AssetManager::AddTexture(SDL_Renderer* renderer, const std::string& assetId
 		spdlog::error("Failed to create texture from surface for file: " + filePath + " SDL_Error: " + SDL_GetError());
 		return false;
 	}
+
 	textures.emplace(assetId, std::move(texture));
 	return true;
 }
